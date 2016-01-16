@@ -66,15 +66,20 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
     	cameraThing();
     	leftInput = leftStick.getY() * -1; //leftInput = left Y
-    	rightInput = rightStick.getY() * -1; //rightInput = right Y
+    	rightInput = (rightStick.getY() * -1); //rightInput = right Y
     		
         if (leftStick.getRawButton(1)) { //Saftey mode
         	leftInput /= 2;
         	rightInput /= 2;
         }
-        if (rightStick.getRawButton(1)) leftInput = rightInput; //Forward mode
+        //leftInput = rightInput;
         
-        driveSystem.tankDrive(leftInput, rightInput);
+        if (leftStick.getRawButton(2)) {
+        	leftInput = leftStick.getZ();
+        	rightInput = leftInput * -1;
+        }
+        
+        driveSystem.tankDrive(leftInput * .7, rightInput * .6, false); //1.6
 
         Timer.delay(0.005);		// wait for a motor update time
     } //End teleopPeriodic
