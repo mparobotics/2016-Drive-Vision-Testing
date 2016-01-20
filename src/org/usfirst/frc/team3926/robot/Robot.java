@@ -66,10 +66,12 @@ public class Robot extends IterativeRobot {
     	
         frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
 
-        distanceEncoder = new Encoder(0, 1, true, EncodingType.k4X);
+        distanceEncoder = new Encoder(0, 1, 2, true);
+        
         distanceEncoder.setMaxPeriod(.1); //Maximum period (in seconds) where the encoder is still considered moving
-        distanceEncoder.setMinRate(10); //Minimum rate before the device is considered stopped
-        distanceEncoder.setDistancePerPulse(4); //4 inches per pulse
+        //distanceEncoder.setMinRate(10); //Minimum rate before the device is considered stopped
+        distanceEncoder.setDistancePerPulse(4/48); //4 inches per pulse
+        
     }
 
     
@@ -121,7 +123,8 @@ public class Robot extends IterativeRobot {
     	driveSystem.mecanumDrive_Polar(autoSpeed, autoDirection, autoRotate);
     }
     
-    public void teleopPeriodic() {
+    @SuppressWarnings("deprecation")
+	public void teleopPeriodic() {
     	cameraThing();
     	leftInput = leftStick.getY() * -1; //leftInput = left Y
     	rightInput = (rightStick.getY() * -1); //rightInput = right Y
@@ -140,11 +143,13 @@ public class Robot extends IterativeRobot {
         driveSystem.tankDrive(leftInput * .7, rightInput * .6, false); //1.6
 
         Timer.delay(0.005);		// wait for a motor update time
-        SmartDashboard.putInt("Encoder: ", distanceEncoder.get());
-        SmartDashboard.putDouble("Front Right Speed", talonSRX_FR.getSpeed());
-        SmartDashboard.putDouble("Front Left Speed", talonSRX_FL.getSpeed());
-        SmartDashboard.putDouble("Back Right Speed", talonSRX_BR.getSpeed());
-        SmartDashboard.putDouble("Back Left Speed", talonSRX_BL.getSpeed());
+        SmartDashboard.putInt("Encoder Count: ", distanceEncoder.get());
+        SmartDashboard.putDouble("Encoder Distance: ", distanceEncoder.getDistance());
+        SmartDashboard.putDouble("Left Speed", leftInput);
+        SmartDashboard.putDouble("Right Speed", rightInput);
+        SmartDashboard.putInt("Encoder scale: ", distanceEncoder.getEncodingScale());
+        SmartDashboard.putDouble("Encoder Rate", distanceEncoder.getRate());
+        SmartDashboard.putDouble("Encoder thing", distanceEncoder.getSamplesToAverage());
     } //End teleopPeriodic
     
     
