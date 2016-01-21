@@ -8,7 +8,6 @@ import com.ni.vision.NIVision.ShapeMode;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -47,15 +46,17 @@ public class Robot extends IterativeRobot {
 	double autoDirection = 0;
 	double autoRotate = 0;
 	int rotateCounter = 0;
-    
 	
+	boolean rotateDone = false;
+	double deltaTime = 0;
+    
     public void robotInit() {
     	talonSRX_FR = new CANTalon(2); //CAN ID (not position in loop)
     	talonSRX_FL = new CANTalon(1);
     	talonSRX_BR = new CANTalon(3);
     	talonSRX_BL = new CANTalon(11);
     	
-    	driveSystem = new RobotDrive(talonSRX_FL, talonSRX_BL, talonSRX_FR, talonSRX_BR);
+    	driveSystem = new RobotDrive(talonSRX_FL, talonSRX_BL, talonSRX_FR, talonSRX_BR); //Setup the driveSystem
     	
     	leftStick = new Joystick(0); //USB 0
     	rightStick = new Joystick(1); //USB 1
@@ -69,63 +70,78 @@ public class Robot extends IterativeRobot {
         distanceEncoder = new Encoder(0, 1, 2, true);
         
         distanceEncoder.setMaxPeriod(.1); //Maximum period (in seconds) where the encoder is still considered moving
-        //distanceEncoder.setMinRate(10); //Minimum rate before the device is considered stopped
-        distanceEncoder.setDistancePerPulse(4/48); //4 inches per pulse
+        distanceEncoder.setDistancePerPulse(4/48); //4 inches per pulse 
         
-    }
-
-    
-    public void autonomousInit() { //TODO find relations to positions on the other side
-    	if (autoStart == 1) {
-    		autoDrive1 = 116;
-    		autoDrive2 = 134;
-    		autoRotate1 = 60;
-    	}
-    	else if (autoStart == 2) {
-    		//TODO set distances from position 2
-    	}
-    	else if (autoStart == 3) {
-    		//TODO set distances from position 3
-    	}
-    	else if (autoStart == 4) {
-    		//TODO set distances from position 4
-    	}
-    	else if (autoStart == 5) {
-    		//TODO set distances from position 5
-    	}
-    	else if (autoStart == 6) {
-    		//TODO set distances from the secret enterence
-    	}
-    	else {
-    		autoDrive1 = 0;
-    		autoDrive2 = 0;
-    		autoDrive3 = 0;
-    		autoDrive4 = 0;
-    		autoRotate1 = 0;
-    	}
-    }
+        cameraThing();
+    } //End robotInit()
     
     public void autonomousPeriodic() {
     	if (autoStart ==1) {
-    		if (distanceEncoder.get() < 116) autoSpeed = .5;
-    		else if (autoRotate < autoRotate1) {
-    			++autoRotate;
-    			distanceEncoder.reset();
+    		if (distanceEncoder.getDistance() < 116) autoSpeed = .5;
+    		else if (!rotateDone) {
+    			if (deltaTime == 0) deltaTime = System.currentTimeMillis();
+    			else if (System.currentTimeMillis() - deltaTime < 1.5) autoRotate = .5;
+    			else {
+    				rotateDone = true;
+    				distanceEncoder.reset();
+    				autoRotate = 0;
+    			}
     		}
-    		else if (distanceEncoder.get() < autoDrive2) {
-    			autoRotate = 0;
-    			autoSpeed = .5;
-    		}
+    		else if (distanceEncoder.get() < 108) autoSpeed = .5;
+    		else SmartDashboard.putString("Autonomous Status", "Done"); //Tell the user that autonomous is done
     	} //End start position 1
     	
-    	SmartDashboard.putInt("Encoder: ", distanceEncoder.get());
+    	else if (autoStart == 2) {
+    		//TODO make code for starting position 2
+    	}
     	
-    	driveSystem.mecanumDrive_Polar(autoSpeed, autoDirection, autoRotate);
-    }
+    	else if (autoStart == 3) {
+    		//TODO make code for starting position 3
+    	}
+    	
+    	else if (autoStart == 4) {
+    		//TODO make code for starting position 4
+    	}
+    	
+    	else if (autoStart == 5) {
+    		//TODO make code for starting position 5
+    	}
+    	
+    	else if (autoStart == 6) {
+    		//TODO make code for starting position from the secret passage
+    	}
+    	
+    	else if (autoStart == 7) {
+    		//TODO make code for starting position 1 on the other side
+    	}
+    	
+    	else if (autoStart == 8) {
+    		//TODO make code for starting position 2 on the other side
+    	}
+    	
+    	else if (autoStart == 9) {
+    		//TODO make code for starting position 3 on the other side
+    	}
+    	
+    	else if (autoStart == 10) {
+    		//TODO make code for starting position 4 on the other side
+    	}
+    	
+    	else if (autoStart == 11) {
+    		//TODO make code for starting position 5 on the other side
+    	}
+    	
+    	else if (autoStart == 12) {
+    		//TODO make code for starting position from the other secret passage
+    	}
+    	
+    	driveSystem.mecanumDrive_Polar(autoSpeed, autoDirection, autoRotate); //We are using mecanum so that we can rotate
+    } //end autonomousPeriodic()
     
-    @SuppressWarnings("deprecation")
+    
+    @SuppressWarnings("deprecation") //Cause they don't know how to drive station like we do
 	public void teleopPeriodic() {
-    	cameraThing();
+    	//cameraThing(); //Run the camera
     	leftInput = leftStick.getY() * -1; //leftInput = left Y
     	rightInput = (rightStick.getY() * -1); //rightInput = right Y
     		
@@ -133,7 +149,8 @@ public class Robot extends IterativeRobot {
         	leftInput /= 2;
         	rightInput /= 2;
         }
-        //leftInput = rightInput;
+        
+        if (rightStick.getRawButton(1)) leftInput = rightInput;
         
         if (leftStick.getRawButton(2)) {
         	leftInput = leftStick.getZ();
@@ -142,26 +159,22 @@ public class Robot extends IterativeRobot {
         
         driveSystem.tankDrive(leftInput * .7, rightInput * .6, false); //1.6
 
-        Timer.delay(0.005);		// wait for a motor update time
         SmartDashboard.putInt("Encoder Count: ", distanceEncoder.get());
         SmartDashboard.putDouble("Encoder Distance: ", distanceEncoder.getDistance());
         SmartDashboard.putDouble("Left Speed", leftInput);
         SmartDashboard.putDouble("Right Speed", rightInput);
-        SmartDashboard.putInt("Encoder scale: ", distanceEncoder.getEncodingScale());
-        SmartDashboard.putDouble("Encoder Rate", distanceEncoder.getRate());
-        SmartDashboard.putDouble("Encoder thing", distanceEncoder.getSamplesToAverage());
+        Timer.delay(0.005);		// wait for a motor update time
     } //End teleopPeriodic
     
     
-    public void cameraThing() {
+    public void cameraThing() { //We see things with this
     	NIVision.Rect rect = new NIVision.Rect(200, 250, 100, 100);
 
-
         NIVision.IMAQdxGrab(session, frame, 1);
-        NIVision.imaqDrawShapeOnImage(frame, frame, rect,
-                DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
+        NIVision.imaqDrawShapeOnImage(frame, frame, rect, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);
         
         CameraServer.getInstance().setImage(frame);
-    }
-    
-}
+        Timer.delay(0.005);
+        cameraThing(); //TODO see if all this works
+    } //End cameraThing()
+} //End robot class
