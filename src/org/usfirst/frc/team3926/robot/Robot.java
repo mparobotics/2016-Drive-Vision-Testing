@@ -45,7 +45,7 @@ public class Robot extends IterativeRobot {
 	boolean rotateDone = false;
 	double deltaTime = 0; //This helps measure the time for rotations
 	
-	boolean sloppy = false;
+	boolean sloppy = false; /* TODO Name these and make sure they are correctly used */
 	boolean fukit = false;
 	boolean imsleep = false;
     
@@ -76,7 +76,8 @@ public class Robot extends IterativeRobot {
     //////////////////^_^!!!END!!!^_^//////////////////
     
     public void autonomousPeriodic() {
-    	if (autoStart ==1) { //TODO JOE: change this to a switch statement
+    	switch (autoStart){
+    	case 1: // Starting Position 1, located at the botom of team 1 start
     		if (distanceEncoder.getDistance() < 116 && !sloppy) autoSpeed = .5;
     		else if (!rotateDone) {
     			sloppy = true;
@@ -84,9 +85,10 @@ public class Robot extends IterativeRobot {
     		}
     		else if (distanceEncoder.getDistance() < 108) autoSpeed = .5;
     		else autoDone(); //Tell the user that autonomous is done
-    	} //End autoStart 1
+    		break;
+    	 //End autoStart 1
     	
-    	else if (autoStart == 2) {
+    	case 2: //Starting Position 2, located 1 from the bottomg of team 1 start 
     		if (distanceEncoder.getDistance() < 116 && !sloppy) autoSpeed = .5;
     		else if (!rotateDone) {
     			sloppy = true;
@@ -99,51 +101,52 @@ public class Robot extends IterativeRobot {
     		else if (!fukit) autoRotateX(1.75, fukit); //TODO Test this rotate time
     		else if (distanceEncoder.getDistance() <108 && !imsleep) autoSpeed = .5;
     		else autoDone();
-    	} //End autoStart 1
-    	
-    	else if (autoStart == 3) {
+    		break;
+    	 //End autoStart 1
+    	// TODO Verify where each of these starting positions are and specify 
+    	case 3: 
     		//TODO make code for starting position 3
-    	}
+    	break;
     	
-    	else if (autoStart == 4) {
+    	case 4:
     		//TODO make code for starting position 4
-    	}
+    	break;
     	
-    	else if (autoStart == 5) {
+    	case 5:
     		//TODO make code for starting position 5
-    	}
+    	break;
     	
-    	else if (autoStart == 6) {
+    	case 6:
     		//TODO make code for starting position from the secret passage
-    	}
+    	break;
     	
-    	else if (autoStart == 7) {
+    	case 7:
     		//TODO make code for starting position 1 on the other side
-    	}
+    	break;
     	
-    	else if (autoStart == 8) {
+    	case 8:
     		//TODO make code for starting position 2 on the other side
-    	}
+    	break;
     	
-    	else if (autoStart == 9) {
+    	case 9:
     		//TODO make code for starting position 3 on the other side
-    	}
+    	break;
     	
-    	else if (autoStart == 10) {
+    	case 10:
     		//TODO make code for starting position 4 on the other side
-    	}
+    	break;
     	
-    	else if (autoStart == 11) {
+    	case 11:
     		//TODO make code for starting position 5 on the other side
-    	}
+    	break;
     	
-    	else if (autoStart == 12) {
+    	case 12:
     		//TODO make code for starting position from the other secret passage
+    	break;
     	}
-    	
     	driveSystem.mecanumDrive_Polar(autoSpeed, autoDirection, autoRotate); //We are using mecanum so that we can rotate
     } //end autonomousPeriodic()
-    //////////////////^_^!!!END!!!^_^//////////////////
+    //////////////////END///////////////
     
     public void autoRotateX(double rotateTime, boolean reset) { //X corresponds to our marking on the board not the axis
     	if (deltaTime == 0) deltaTime = System.currentTimeMillis();
@@ -154,12 +157,12 @@ public class Robot extends IterativeRobot {
 			autoRotate = 0;
 		}
     }
-    //////////////////^_^!!!END!!!^_^//////////////////
+    //////////////////END////////////////
     
     public void autoDone() {
     	SmartDashboard.putString("Autonomous Status", "Done");;
     }
-    //////////////////^_^!!!END!!!^_^//////////////////
+    //////////////////END////////////////
     
     @SuppressWarnings("deprecation") //Cause they don't know how to drive station like we do
 	public void teleopPeriodic() {
@@ -187,7 +190,7 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putDouble("Right Speed", rightInput);
         Timer.delay(0.005);		// wait for a motor update time
     } //End teleopPeriodic
-    //////////////////^_^!!!END!!!^_^//////////////////
+    //////////////////END////////////////
     
     public void cameraThing() { //We see things with this
     	NIVision.Rect rect = new NIVision.Rect(200, 250, 100, 100);
