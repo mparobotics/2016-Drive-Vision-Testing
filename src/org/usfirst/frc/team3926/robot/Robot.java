@@ -24,21 +24,19 @@ public class Robot extends IterativeRobot {
 
 	RobotDrive driveSystem;
 	Joystick leftStick;
+	double leftInput;
 	Joystick rightStick;
+	double rightInput;
 	
 	int session;
     Image frame;
     CameraServer server;
     
     Encoder distanceEncoder;
-    
-    double leftInput;
-	double rightInput;
 	
 	double autoSpeed = 0; //This stuff is used to control the robot during autonomous
 	double autoDirection = 0;
 	double autoRotate = 0;
-	int rotateCounter = 0;
 	
 	double deltaTime = 0; //This helps measure the time for rotations
 	
@@ -83,9 +81,13 @@ public class Robot extends IterativeRobot {
         NIVision.IMAQdxConfigureGrab(session);
     	
         frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
-
-        distanceEncoder = new Encoder(0, 1, 2, true);
         
+        /**
+         * 0 Digital Input Output (DIO) port of B (B on the encoder)
+         * 1 DIO port of A
+         * 2 DIO port of X (the index)
+         */
+        distanceEncoder = new Encoder(0, 1, 2, true);
         distanceEncoder.setMaxPeriod(.1); //Maximum period (in seconds) where the encoder is still considered moving
         distanceEncoder.setDistancePerPulse((4*(3*Math.PI))/48); //4pi inches per pulse TODO set to constant values
         
@@ -94,13 +96,13 @@ public class Robot extends IterativeRobot {
     //////////////////END//////////////////
     
     public void autonomousInit() {
-    	
+    	//We currently do not need anything in here, but if we want it we have it
     }
     
     public void autonomousPeriodic() {
     	/**
     	 * For clarification on the meaning of these numbers see the above function autoStart() and the integers above it
-    	 * Set the starting position within the method call here
+    	 * Set the starting position within the method call within autoStart() below
     	 */
     	switch (autoStart(LowBar)) {
 	    	case 1:
@@ -110,7 +112,7 @@ public class Robot extends IterativeRobot {
 	    		else autoDone(); //Tell the user that autonomous is done
 	    		break;
 	    	
-	    	case 2: //Starting Position 2, located 1 from the bottomg of team 1 start 
+	    	case 2:
 	    		if (!eventTriggerOne) autoDriveTo(116, eventTriggerOne);
 	    		else if (!eventTriggerTwo) autoRotate(ninetyDegreeTime, eventTriggerTwo, false, true); //False == left
 	    		else if (!eventTriggerThree) autoDriveTo(48, eventTriggerThree);
@@ -145,7 +147,8 @@ public class Robot extends IterativeRobot {
 	    		break;
 	    	
 	    	case 6: //Starts behind 5
-	    		if (!eventTriggerOne) autoDriveTo (66, eventTriggerOne); //TODO I'll finish this function
+	    		if (!eventTriggerOne) autoDriveTo(66, eventTriggerOne); //TODO I'll finish this function
+	    		else if (!eventTriggerTwo) autoRotate(ninetyDegreeTime, eventTriggerTwo, false, true);
 	    		/*
 	    		 * go 66
 	    		 * turn right 90
@@ -196,7 +199,7 @@ public class Robot extends IterativeRobot {
     
     @SuppressWarnings("deprecation") //Cause they don't know how to drive station like we do
 	public void teleopPeriodic() {
-    	//cameraThing(); //Run the camera
+    	//cameraThing(); //Run the camera TODO test new recursive function before using this
     	leftInput = leftStick.getY() * -1; //leftInput = left Y
     	rightInput = (rightStick.getY() * -1); //rightInput = right Y
     		
