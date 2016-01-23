@@ -1,4 +1,4 @@
-
+//THIS IS STILL BETA CODE, IT IS STILL MESSY, IT MIGHT NOT ALL WORK
 package org.usfirst.frc.team3926.robot;
 
 import com.ni.vision.NIVision;
@@ -35,19 +35,38 @@ public class Robot extends IterativeRobot {
     double leftInput;
 	double rightInput;
 	
-	int autoStart = 1; //the number of the defense the robot is starting in front of
-	
 	double autoSpeed = 0; //This stuff is used to control the robot during autonomous
 	double autoDirection = 0;
 	double autoRotate = 0;
 	int rotateCounter = 0;
 	
-	boolean rotateDone = false;
 	double deltaTime = 0; //This helps measure the time for rotations
 	
-	boolean sloppy = false; /* TODO Name these and make sure they are correctly used */
-	boolean fukit = false;
-	boolean imsleep = false;
+	/**
+	 * @param These eventTriggers are there to tell us if an event has happened in autonomous
+	 */
+	boolean eventTriggerOne = false;
+	boolean eventTriggerTwo = false;
+	boolean eventTriggerThree = false;
+	boolean eventTriggerFour = false;
+	boolean eventTriggerFive = false;
+	
+	static double ninetyDegreeTime = 1.75;
+	static double magicAngleTime = 1.5; //This is the one angle that rotates us towards the low goal
+	
+	//Team colors cordinate to the defending allience
+	//These are to simplify the process of selecting the autonomous starting position
+	//Because angles are reflected the starting positions are the same for both sides
+	static int LowBar = 1;
+	static int Two = 2;
+	static int CrowdsChoice = 3;
+	static int Four = 4;
+	static int Five = 5;
+	static int SecretPassage = 6;
+		
+	public int autoStart(int startPosition) {
+		return startPosition; //Set this to wherever you want the robot to start
+	}
     
     public void robotInit() {
     	talonSRX_FR = new CANTalon(2); //CAN ID (not position in loop)
@@ -60,8 +79,7 @@ public class Robot extends IterativeRobot {
     	leftStick = new Joystick(0); //USB 0
     	rightStick = new Joystick(1); //USB 1
         
-    	session = NIVision.IMAQdxOpenCamera("cam0",
-                 NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+    	session = NIVision.IMAQdxOpenCamera("cam0", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
         NIVision.IMAQdxConfigureGrab(session);
     	
         frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
@@ -69,93 +87,105 @@ public class Robot extends IterativeRobot {
         distanceEncoder = new Encoder(0, 1, 2, true);
         
         distanceEncoder.setMaxPeriod(.1); //Maximum period (in seconds) where the encoder is still considered moving
-        distanceEncoder.setDistancePerPulse((4*(3*Math.PI))/48); //4pi inches per pulse
+        distanceEncoder.setDistancePerPulse((4*(3*Math.PI))/48); //4pi inches per pulse TODO set to constant values
         
         cameraThing(); //TODO see if this works
     } //End robotInit()
-    //////////////////^_^!!!END!!!^_^//////////////////
+    //////////////////END//////////////////
+    
+    public void autonomousInit() {
+    	
+    }
     
     public void autonomousPeriodic() {
-    	switch (autoStart){
-    	case 1: // Starting Position 1, located at the botom of team 1 start
-    		if (distanceEncoder.getDistance() < 116 && !sloppy) autoSpeed = .5;
-    		else if (!rotateDone) {
-    			sloppy = true;
-    			autoRotateX(1.5, rotateDone); //TODO Test this number
-    		}
-    		else if (distanceEncoder.getDistance() < 108) autoSpeed = .5;
-    		else autoDone(); //Tell the user that autonomous is done
-    		break;
-    	 //End autoStart 1
-    	
-    	case 2: //Starting Position 2, located 1 from the bottomg of team 1 start 
-    		if (distanceEncoder.getDistance() < 116 && !sloppy) autoSpeed = .5;
-    		else if (!rotateDone) {
-    			sloppy = true;
-    			autoRotateX(1.5, rotateDone); //TODO Test this rotate time
-    		}
-    		else if (distanceEncoder.getDistance() < 48) {
-    			autoSpeed = .5;
-    			rotateDone = false;
-    		}
-    		else if (!fukit) autoRotateX(1.75, fukit); //TODO Test this rotate time
-    		else if (distanceEncoder.getDistance() <108 && !imsleep) autoSpeed = .5;
-    		else autoDone();
-    		break;
-    	 //End autoStart 1
-    	// TODO Verify where each of these starting positions are and specify 
-    	case 3: 
-    		//TODO make code for starting position 3
-    	break;
-    	
-    	case 4:
-    		//TODO make code for starting position 4
-    	break;
-    	
-    	case 5:
-    		//TODO make code for starting position 5
-    	break;
-    	
-    	case 6:
-    		//TODO make code for starting position from the secret passage
-    	break;
-    	
-    	case 7:
-    		//TODO make code for starting position 1 on the other side
-    	break;
-    	
-    	case 8:
-    		//TODO make code for starting position 2 on the other side
-    	break;
-    	
-    	case 9:
-    		//TODO make code for starting position 3 on the other side
-    	break;
-    	
-    	case 10:
-    		//TODO make code for starting position 4 on the other side
-    	break;
-    	
-    	case 11:
-    		//TODO make code for starting position 5 on the other side
-    	break;
-    	
-    	case 12:
-    		//TODO make code for starting position from the other secret passage
-    	break;
+    	/**
+    	 * For clarification on the meaning of these numbers see the above function autoStart() and the integers above it
+    	 * Set the starting position within the method call here
+    	 */
+    	switch (autoStart(LowBar)) {
+	    	case 1:
+	    		if (!eventTriggerOne) autoDriveTo(116, eventTriggerOne);
+	    		else if (!eventTriggerTwo) autoRotate(magicAngleTime, eventTriggerTwo, true, true);
+	    		else if (!eventTriggerThree) autoDriveTo(108, eventTriggerThree);
+	    		else autoDone(); //Tell the user that autonomous is done
+	    		break;
+	    	
+	    	case 2: //Starting Position 2, located 1 from the bottomg of team 1 start 
+	    		if (!eventTriggerOne) autoDriveTo(116, eventTriggerOne);
+	    		else if (!eventTriggerTwo) autoRotate(ninetyDegreeTime, eventTriggerTwo, false, true); //False == left
+	    		else if (!eventTriggerThree) autoDriveTo(48, eventTriggerThree);
+	    		else if (!eventTriggerFour) autoRotate(magicAngleTime  - ninetyDegreeTime, eventTriggerFour, true, true); //True == right We subtract the ninety time because we have already turned 90 degrees of the turn
+	    		else if (!eventTriggerFive) autoDriveTo(108, eventTriggerFive);
+	    		else autoDone();
+	    		break;
+	    	
+	    	case 3: 
+	    		if (!eventTriggerOne) autoDriveTo(116, eventTriggerOne);
+	    		else if (!eventTriggerTwo) autoRotate(ninetyDegreeTime, eventTriggerTwo, false, true);
+	    		else if (!eventTriggerThree) autoDriveTo(96, eventTriggerThree);
+	    		else if (!eventTriggerFour) autoRotate(magicAngleTime  - ninetyDegreeTime, eventTriggerFour, true, true);
+	    		else if (!eventTriggerFive) autoDriveTo(108, eventTriggerFive);
+	    		else autoDone();
+	    		break;
+	    	
+	    	case 4:
+	    		if (!eventTriggerOne) autoDriveTo(116, eventTriggerOne);
+	    		else if (!eventTriggerTwo) autoRotate(ninetyDegreeTime, eventTriggerTwo, true, true);
+	    		else if (!eventTriggerThree) autoDriveTo(48, eventTriggerThree);
+	    		else if (!eventTriggerFour) autoRotate(magicAngleTime  - ninetyDegreeTime, eventTriggerFour, true, true);
+	    		else if (!eventTriggerFive) autoDriveTo(108, eventTriggerFive);
+	    		else autoDone();
+	    		break;
+	    	
+	    	case 5:
+	    		if (!eventTriggerOne) autoDriveTo(116, eventTriggerOne);
+	    		else if (!eventTriggerTwo) autoRotate(magicAngleTime, eventTriggerTwo, false, true);
+	    		else if (!eventTriggerThree) autoDriveTo(108, eventTriggerThree);
+	    		else autoDone();
+	    		break;
+	    	
+	    	case 6: //Starts behind 5
+	    		if (!eventTriggerOne) autoDriveTo (66, eventTriggerOne); //TODO I'll finish this function
+	    		/*
+	    		 * go 66
+	    		 * turn right 90
+	    		 * go 170
+	    		 * go 66
+	    		 * do 5 - 90
+	    		 */
+	    		break;
     	}
+    	
     	driveSystem.mecanumDrive_Polar(autoSpeed, autoDirection, autoRotate); //We are using mecanum so that we can rotate
     } //end autonomousPeriodic()
     //////////////////END///////////////
-    
-    public void autoRotateX(double rotateTime, boolean reset) { //X corresponds to our marking on the board not the axis
+    /** THIS FUNCTION ROTATES THE ROBOT
+     * @param rotateTime: The time (in seconds) for the robot to rotate
+     * @param setTrue: The boolean to set to true when the rotate has finished, this handles events to make sure they don't repeat
+     * @param rotateRight: Set to true if you're trying to rotate to the right
+     * @param resetDistance: Tell it to reset the encoders distance, this is here because it makes it easier to manage the logic
+     * ^ whenever we stop driving straight, we're going to rotate
+     */
+    public void autoRotate(double rotateTime, boolean setTrue, boolean rotateRight, boolean resetDistance) { //X corresponds to our marking on the board not the axis
     	if (deltaTime == 0) deltaTime = System.currentTimeMillis();
 		else if (System.currentTimeMillis() - deltaTime < rotateTime) autoRotate = .5;
 		else {
-			reset = true;
-			distanceEncoder.reset();
-			autoRotate = 0;
+			setTrue = true;
+			if (resetDistance) distanceEncoder.reset();
+			autoRotate = 0; //Set the speed to 0 to prevent the robot from rotating more
 		}
+
+    	if (rotateRight) autoRotate *= -1;
+    }
+    //////////////////END////////////////
+    /** THIS FUNCTION MOVES THE ROBOT IN AUTONOMOUS MODE
+     * @param driveDistance: The distance to drive forward (in inches)
+     * @param eventHappened: boolean to use to tell the system that this took place
+     */
+    public void autoDriveTo(int driveDistance, boolean eventHappened) {
+    	if (distanceEncoder.getDistance() < driveDistance) autoSpeed = 0.5;
+    	else eventHappened = true;
+    	
     }
     //////////////////END////////////////
     
@@ -182,7 +212,7 @@ public class Robot extends IterativeRobot {
         	rightInput = leftInput * -1;
         }
         
-        driveSystem.tankDrive(leftInput * .7, rightInput * .6, false); //1.6
+        driveSystem.tankDrive(leftInput * .7, rightInput * .6, false); //These multipliers are to attempt to compensate for the wacky gearbox
 
         SmartDashboard.putInt("Encoder Count: ", distanceEncoder.get());
         SmartDashboard.putDouble("Encoder Distance: ", distanceEncoder.getDistance());
