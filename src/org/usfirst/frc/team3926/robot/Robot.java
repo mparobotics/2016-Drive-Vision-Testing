@@ -78,6 +78,49 @@ public class Robot extends IterativeRobot {
     	
     	leftStick = new Joystick(0); //USB 0
     	rightStick = new Joystick(1); //USB 1
+    	
+    	if (leftStick.getRawButton(1)) SmartDashboard.putBoolean("Left Stick Trigger", true);
+    	else SmartDashboard.putBoolean("Left Stick Trigger", false);
+    	
+    	
+    	if (leftStick.getRawButton(2)) SmartDashboard.putBoolean("Left Stick Button 2", true); 
+    	else SmartDashboard.putBoolean("Left Stick Button 2", false);
+    		
+    	
+    	if (leftStick.getRawButton(3)) SmartDashboard.putBoolean("Left Stick Button 3", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 3", false);
+    			
+    	
+    	if (leftStick.getRawButton(4)) SmartDashboard.putBoolean("Left Stick Button 4", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 3", false);
+    			
+    	if (leftStick.getRawButton(5)) SmartDashboard.putBoolean("Left Stick Button 5", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 5", false);
+    	
+    	if (leftStick.getRawButton(6)) SmartDashboard.putBoolean("Left Stick Button 6", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 6", false);
+    	
+    	if (leftStick.getRawButton(7)) SmartDashboard.putBoolean("Left Stick Button 7", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 7", false);
+    	
+    	if (leftStick.getRawButton(8)) SmartDashboard.putBoolean("Left Stick Button 8", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 8", false);
+    	
+    	if (leftStick.getRawButton(9)) SmartDashboard.putBoolean("Left Stick Button 9", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 9", false);
+    	
+    	if (leftStick.getRawButton(10)) SmartDashboard.putBoolean("Left Stick Button 10", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 10", false);
+    	
+    	if (leftStick.getRawButton(11)) SmartDashboard.putBoolean("Left Stick Button 11", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 11", false);
+    	
+    	if (leftStick.getRawButton(12)) SmartDashboard.putBoolean("Left Stick Button 12", true);
+    	else SmartDashboard.putBoolean("Left Stick Button 12", false);
+    	
+    	
+    	
+  
         
     	session = NIVision.IMAQdxOpenCamera("cam0", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
         NIVision.IMAQdxConfigureGrab(session);
@@ -110,7 +153,7 @@ public class Robot extends IterativeRobot {
 	    		else autoDone(); //Tell the user that autonomous is done
 	    		break;
 	    	
-	    	case 2: //Starting Position 2, located 1 from the bottomg of team 1 start 
+	    	case 2: //Starting Position 2, located 1 from the bottom of team 1 start 
 	    		if (!eventTriggerOne) autoDriveTo(116, eventTriggerOne);
 	    		else if (!eventTriggerTwo) autoRotate(ninetyDegreeTime, eventTriggerTwo, false, true); //False == left
 	    		else if (!eventTriggerThree) autoDriveTo(48, eventTriggerThree);
