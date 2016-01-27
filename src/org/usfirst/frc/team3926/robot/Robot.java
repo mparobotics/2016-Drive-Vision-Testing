@@ -21,7 +21,7 @@ public class Robot extends IterativeRobot {
 	CANTalon talonSRX_FL; //Front Left
 	CANTalon talonSRX_BR; //Back Right
 	CANTalon talonSRX_BL; //Back Left
-	CANTalon sketchMotor;
+	CANTalon sketchMotor; // Wheel on arm
 
 	RobotDrive driveSystem;
 	Joystick leftStick;
@@ -310,6 +310,13 @@ public class Robot extends IterativeRobot {
         Timer.delay(0.005);		// wait for a motor update time
         
         cameraThing();
+        
+        if(rightStick.getRawButton(6)) sketchMotor.set(0.25); // Controlling the arm wheel forwards and backwards 
+        else if (rightStick.getRawButton(4) sketchMotor.set(-0.25));
+        else sketchMotor.set(0);
+        
+     
+        
     } 
     ////End teleopPeriodic()////
     
